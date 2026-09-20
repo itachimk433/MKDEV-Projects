@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MKDEV Projects — software that plays well, by Banele Charles Makhanya.">
+  <title>MKDEV Projects</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* The visual language intentionally matches MKBOARDGAMES-TERMS. */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    :root {
+      --bg-color: #eef1f8;
+      --card-bg: #eef1f8;
+      --text-main: #2d3652;
+      --text-muted: #8a94ad;
+      --accent-blue: #3b82f6;
+      --accent-purple: #7c63d8;
+      --shadow-flat: 10px 10px 20px rgba(163, 177, 198, 0.55), -10px -10px 20px rgba(255, 255, 255, 0.85);
+      --shadow-hover: 14px 14px 28px rgba(163, 177, 198, 0.65), -14px -14px 28px rgba(255, 255, 255, 0.95);
+      --shadow-inset: inset 4px 4px 8px rgba(163,177,198,0.5), inset -4px -4px 8px rgba(255,255,255,0.9);
+      --shadow-button: 6px 6px 14px rgba(163,177,198,0.55), -6px -6px 14px rgba(255,255,255,0.85);
+      --shadow-button-pressed: inset 3px 3px 7px rgba(163,177,198,0.5), inset -3px -3px 7px rgba(255,255,255,0.85);
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      overflow-x: hidden;
+      padding: 20px 15px;
+      position: relative;
+    }
+
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      background: #ffffff;
+      opacity: 0.6;
+      filter: blur(2px);
+      z-index: 0;
+      pointer-events: none;
+    }
+    .blob.b1 { width: 220px; height: 220px; top: -80px; left: -80px; }
+    .blob.b2 { width: 260px; height: 260px; top: -100px; right: -100px; background:#dfe6f5; }
+    .blob.b3 { width: 180px; height: 180px; bottom: -60px; left: 10%; background:#e4e9f7; }
+    .blob.b4 { width: 240px; height: 240px; bottom: -100px; right: -60px; }
+
+    .app-container {
+      width: 100%;
+      max-width: 760px;
+      background: var(--card-bg);
+      border-radius: 30px;
+      padding: 22px 25px 30px;
+      box-shadow: var(--shadow-flat);
+      position: relative;
+      z-index: 1;
+      margin-top: 15px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .brand-mark {
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 1.8px;
+    }
+    .topbar-button,
+    .back-button {
+      border: none;
+      background: var(--card-bg);
+      color: var(--accent-blue);
+      width: 38px;
+      height: 38px;
+      border-radius: 13px;
+      box-shadow: var(--shadow-button);
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+    }
+    .topbar-button:hover,
+    .back-button:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
+    }
+    .topbar-button:active,
+    .back-button:active {
+      transform: translateY(1px);
+      box-shadow: var(--shadow-button-pressed);
+    }
+
+    .view {
+      animation: view-in 0.28s ease both;
+    }
+    .view[hidden] {
+      display: none;
+    }
+    @keyframes view-in {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .avatar-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-top: 3px;
+      margin-bottom: 15px;
+    }
+    .avatar-icon {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: var(--card-bg);
+      box-shadow: var(--shadow-button);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-blue);
+      font-size: 1.8rem;
+    }
+    .hero-title {
+      text-align: center;
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .hero-tagline {
+      text-align: center;
+      font-size: 0.98rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+      margin-bottom: 8px;
+      padding: 0 10px;
+    }
+    .identity-line {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 30px;
+    }
+    .identity-line strong {
+      color: var(--text-main);
+    }
+
+    .section-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-main);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title i {
+      color: var(--accent-blue);
+    }
+
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .project-card {
+      background: var(--card-bg);
+      border-radius: 18px;
+      padding: 19px 20px;
+      min-height: 178px;
+      box-shadow: var(--shadow-button);
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .project-card:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-3px);
+    }
+    .project-card.featured {
+      grid-column: 1 / -1;
+      min-height: 205px;
+      border-top: 3px solid var(--accent-blue);
+    }
+    .project-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 15px;
+      background: var(--card-bg);
+      box-shadow: var(--shadow-inset);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-blue);
+      font-size: 1.2rem;
+      margin-bottom: 14px;
+    }
+    .project-card h3 {
+      color: var(--text-main);
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+    .project-card p {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      line-height: 1.55;
+      margin-bottom: 14px;
+    }
+    .project-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: auto;
+    }
+    .project-status {
+      color: var(--accent-blue);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .project-arrow {
+      color: var(--accent-blue);
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .project-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 2px;
+    }
+    .project-link {
+      color: var(--accent-blue);
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 7px 10px;
+      border-radius: 10px;
+      background: var(--card-bg);
+      box-shadow: var(--shadow-button);
+      text-decoration: none;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .project-link:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .summary-box {
+      background: var(--card-bg);
+      border-radius: 18px;
+      padding: 19px 20px;
+      margin-bottom: 25px;
+      box-shadow: var(--shadow-inset);
+      border-left: 4px solid var(--accent-blue);
+      font-size: 0.88rem;
+      line-height: 1.65;
+    }
+    .summary-box strong {
+      color: var(--text-main);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      text-align: center;
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 15px 9px;
+      box-shadow: var(--shadow-button);
+    }
+    .stat-number {
+      display: block;
+      color: var(--accent-blue);
+      font-size: 1.4rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .stat-label {
+      display: block;
+      color: var(--text-muted);
+      font-size: 0.67rem;
+      line-height: 1.35;
+      margin-top: 5px;
+    }
+
+    .skill-list {
+      display: grid;
+      gap: 13px;
+      margin-bottom: 28px;
+    }
+    .skill-card,
+    .settings-row {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 15px 17px;
+      box-shadow: var(--shadow-button);
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
+    .skill-icon,
+    .settings-icon {
+      flex: 0 0 37px;
+      width: 37px;
+      height: 37px;
+      border-radius: 12px;
+      background: var(--card-bg);
+      box-shadow: var(--shadow-inset);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-blue);
+    }
+    .skill-card strong,
+    .settings-row strong {
+      display: block;
+      color: var(--text-main);
+      font-size: 0.86rem;
+      font-weight: 600;
+    }
+    .skill-card span,
+    .settings-row span {
+      display: block;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      margin-top: 2px;
+    }
+    .settings-list {
+      display: grid;
+      gap: 14px;
+    }
+    .settings-row {
+      width: 100%;
+      border: none;
+      text-align: left;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .settings-row:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
+    }
+    .settings-row .row-arrow {
+      color: var(--accent-blue);
+      margin-left: auto;
+      font-size: 1.1rem;
+    }
+    .version-row {
+      cursor: default;
+    }
+    .version-row:hover {
+      transform: none;
+      box-shadow: var(--shadow-button);
+    }
+
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 22px;
+    }
+    .page-heading {
+      font-size: 1.55rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+    .page-subtitle {
+      color: var(--text-muted);
+      font-size: 0.83rem;
+      line-height: 1.5;
+      margin-bottom: 25px;
+    }
+
+    footer {
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(163, 177, 198, 0.3);
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    footer a {
+      color: var(--text-muted);
+      text-decoration: none;
+      margin: 0 6px;
+    }
+    footer a:hover {
+      color: var(--accent-blue);
+    }
+
+    @media (max-width: 560px) {
+      body { padding: 12px 10px; }
+      .app-container { padding: 18px 17px 25px; border-radius: 24px; }
+      .project-grid { grid-template-columns: 1fr; }
+      .project-card.featured { grid-column: auto; }
+      .stats-grid { gap: 8px; }
+      .stat-card { padding-left: 5px; padding-right: 5px; }
+      .stat-label { font-size: 0.62rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+  <div class="blob b4"></div>
+
+  <main class="app-container">
+    <div class="topbar">
+      <button class="topbar-button" data-view="home" aria-label="Go to Home">
+        <i class="fa-solid fa-house"></i>
+      </button>
+      <span class="brand-mark">MKDEV PROJECTS</span>
+      <button class="topbar-button" data-view="settings" aria-label="Open Settings">
+        <i class="fa-solid fa-sliders"></i>
+      </button>
+    </div>
+
+    <section class="view" id="homeView">
+      <div class="avatar-wrapper">
+        <div class="avatar-icon" aria-hidden="true">
+          <i class="fa-solid fa-code"></i>
+        </div>
+      </div>
+
+      <h1 class="hero-title">MKDEV Projects</h1>
+      <p class="hero-tagline">Building software that plays well.</p>
+      <p class="identity-line"><strong>Banele Charles Makhanya</strong> · Durban, South Africa</p>
+
+      <div class="section-title">
+        <i class="fa-solid fa-layer-group"></i> Projects
+      </div>
+
+      <div class="project-grid">
+        <article class="project-card featured">
+          <div class="project-icon" aria-hidden="true">
+            <i class="fa-solid fa-chess-knight"></i>
+          </div>
+          <h3>MK BOARD GAMES</h3>
+          <p>A growing collection of classic and strategy board games for Android, made to make play feel simple, focused, and fun.</p>
+          <div class="project-links">
+            <a class="project-link" href="https://mkboard-games.pages.dev/" target="_blank" rel="noopener">About &amp; Legal</a>
+            <a class="project-link" href="https://play.google.com/store/apps/details?id=com.mkdev.mkboardgames.demo" target="_blank" rel="noopener">Play Store · demo</a>
+            <a class="project-link" href="https://appgallery.huawei.com/#/app/C123456789" target="_blank" rel="noopener">AppGallery · demo</a>
+          </div>
+          <div class="project-footer">
+            <span class="project-status">Shipped · v2.5</span>
+            <span class="project-arrow" aria-hidden="true">→</span>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <div class="project-icon" aria-hidden="true">
+            <i class="fa-solid fa-globe"></i>
+          </div>
+          <h3>Web projects</h3>
+          <p>Useful web experiences, tools, and experiments are being shaped in the MKDEV workshop.</p>
+          <div class="project-footer">
+            <span class="project-status">In progress</span>
+            <span class="project-arrow" aria-hidden="true">↗</span>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <div class="project-icon" aria-hidden="true">
+            <i class="fa-solid fa-gamepad"></i>
+          </div>
+          <h3>Game experiments</h3>
+          <p>Small ideas about play, rules, and interaction — built one experiment at a time.</p>
+          <div class="project-footer">
+            <span class="project-status">Coming next</span>
+            <span class="project-arrow" aria-hidden="true">↗</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="view" id="aboutView" hidden>
+      <button class="back-button" data-view="home" aria-label="Back to Home">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <h2 class="page-heading">About MKDEV</h2>
+      <p class="page-subtitle">A small studio of one, building software with a practical streak and a playful edge.</p>
+
+      <div class="summary-box">
+        <strong>Banele Charles Makhanya</strong> goes by MKDEV. Based in Durban, South Africa, he builds products across the web, mobile, and games — with a focus on making technology feel clear and enjoyable to use.
+      </div>
+
+      <div class="section-title">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> What I do
+      </div>
+      <div class="skill-list">
+        <div class="skill-card">
+          <div class="skill-icon"><i class="fa-solid fa-code"></i></div>
+          <div>
+            <strong>Full stack web development</strong>
+            <span>Interfaces, services, and the useful glue between them.</span>
+          </div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
+          <div>
+            <strong>Mobile app development</strong>
+            <span>Focused tools that fit naturally into everyday life.</span>
+          </div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-icon"><i class="fa-solid fa-gamepad"></i></div>
+          <div>
+            <strong>Mobile game development</strong>
+            <span>Rules, feedback, and a good reason to play one more round.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title">
+        <i class="fa-solid fa-chart-simple"></i> By the numbers
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-number">3</span>
+          <span class="stat-label">core disciplines</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number">1+</span>
+          <span class="stat-label">projects shipped</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number">∞</span>
+          <span class="stat-label">cups of coffee</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="settingsView" hidden>
+      <button class="back-button" data-view="home" aria-label="Back to Home">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <h2 class="page-heading">Settings</h2>
+      <p class="page-subtitle">A few useful places to go next.</p>
+
+      <div class="settings-list">
+        <button class="settings-row" data-view="about">
+          <div class="settings-icon"><i class="fa-solid fa-circle-info"></i></div>
+          <div>
+            <strong>About MKDEV</strong>
+            <span>Skills, stats, and the person behind the projects.</span>
+          </div>
+          <span class="row-arrow">›</span>
+        </button>
+        <a class="settings-row" href="mailto:mkdev4360@gmail.com?subject=MKDEV%20Projects">
+          <div class="settings-icon"><i class="fa-solid fa-envelope"></i></div>
+          <div>
+            <strong>Contact</strong>
+            <span>mkdev4360@gmail.com</span>
+          </div>
+          <span class="row-arrow">›</span>
+        </a>
+        <div class="settings-row version-row">
+          <div class="settings-icon"><i class="fa-solid fa-tag"></i></div>
+          <div>
+            <strong>Version</strong>
+            <span>v1.0.0</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>&copy; 2026 MKDEV Projects</p>
+      <p style="margin-top:10px">
+        <a href="#" data-view="home">Home</a> ·
+        <a href="#" data-view="about">About</a> ·
+        <a href="#" data-view="settings">Settings</a>
+      </p>
+    </footer>
+  </main>
+
+  <script>
+    const views = {
+      home: document.getElementById('homeView'),
+      about: document.getElementById('aboutView'),
+      settings: document.getElementById('settingsView')
+    };
+
+    function showView(name) {
+      const target = views[name] ? name : 'home';
+      Object.entries(views).forEach(([key, view]) => {
+        view.hidden = key !== target;
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      history.replaceState(null, '', target === 'home' ? '#' : `#${target}`);
+    }
+
+    document.querySelectorAll('[data-view]').forEach((control) => {
+      control.addEventListener('click', (event) => {
+        const name = control.dataset.view;
+        if (control.tagName === 'A') event.preventDefault();
+        showView(name);
+      });
+    });
+
+    window.addEventListener('popstate', () => {
+      showView(window.location.hash.slice(1));
+    });
+
+    showView(window.location.hash.slice(1) || 'home');
+  </script>
+</body>
+</html>
